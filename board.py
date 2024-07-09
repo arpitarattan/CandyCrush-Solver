@@ -1,7 +1,7 @@
 import random
 from collections import Counter
 
-candy = ['r', 'b', 'g', 'p', 'o']
+candy_types = ['r', 'b', 'g', 'p', 'o']
 color_map = {
     'r': '\033[38;5;196m●\033[0m',  # Bright Red
     'b': '\033[38;5;33m●\033[0m',   # Bright Blue
@@ -13,12 +13,12 @@ color_map = {
 }
 directions = [(0,1),(1,0)] #check down and right while traversing
 
-random.seed(1)
+random.seed(100)
 
 class CandyCrush:
     def __init__(self, size):
         self.size = size
-        self.board = [[random.choice(candy) for _ in range(size)] for _ in range(size)]
+        self.board = [[random.choice(candy_types) for _ in range(size)] for _ in range(size)]
         self.adj_list = self.build_graph()
 
     def build_graph(self):
@@ -98,8 +98,18 @@ class CandyCrush:
     def update_board(self, matches):
         for match in matches:
             for candy in match[0]:
-                self.board[candy[0]][candy[1]] ='w'
-
+                self.board[candy[0]][candy[1]] = None
+        
+        for col in range(self.size):
+            column_candies = [self.board[row][col] for row in range(self.size) if self.board[row][col] is not None]
+            num_new_candies = self.size - len(column_candies)
+            new_candies = [random.choice(candy_types) for _ in range(num_new_candies)]
+            for row in range(self.size):
+                if row < num_new_candies:
+                    self.board[row][col] = new_candies[row]
+                else:
+                    self.board[row][col] = column_candies[row - num_new_candies]
+                
 def print_board(board):
     for row in board:
         print(" ".join(color_map[candy] for candy in row))
