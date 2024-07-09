@@ -10,7 +10,7 @@ color_map = {
 }
 directions = [(0,1),(1,0)] #check down and right while traversing
 
-random.seed(11)
+random.seed(1)
 
 class CandyCrush:
     def __init__(self, size):
@@ -65,30 +65,37 @@ class CandyCrush:
                     paths.append(component)
         
         for path in paths:
-            match = self.filter_paths(sorted(path))
-            print(sorted(path), match)
-            if len(match) > 2:
-                matches.append(match)
+            sorted_by_x = sorted(path, key=lambda coord: coord[0])
+            sorted_by_y = sorted(path, key=lambda coord: coord[1])
+            
+            matches_x = self.filter_paths(sorted_by_x, 0)
+            matches_y = self.filter_paths(sorted_by_y, 1)
+
+            if(len(matches_x)> 0):
+                matches.append(matches_x)
+            if(len(matches_y)> 0):
+                matches.append(matches_y)
         
+        return matches
     
-    def filter_paths(self, path):
-        # Count occurrences of each row and column
-        row_counts = Counter(x for x, y in path)
-        col_counts = Counter(y for x, y in path)
+    def filter_paths(self, path, coord = 0):
+        matches = []
+        current_match = [path[0]]
+        for i in range(1, len(path)):
+            if path[i][coord] == path[i-1][coord] and abs(path[i][~coord] - path[i-1][~coord]) == 1:
+                current_match.append(path[i])
+            else:
+                if len(current_match) >= 3:
+                    matches.append(current_match)
+                current_match = [path[i]]
+        if len(current_match) >= 3:
+            matches.append(current_match)
+        return matches
 
-        # Determine the most common row and column
-        majority_row = row_counts.most_common(1)[0][0]
-        majority_col = col_counts.most_common(1)[0][0]
-
-        # Filter coordinates by majority row and column
-        filtered_by_row = [coord for coord in path if coord[0] == majority_row]
-        filtered_by_col = [coord for coord in path if coord[1] == majority_col]
-
-        # Choose the larger group (in case of ties, row group is chosen)
-        if len(filtered_by_row) >= len(filtered_by_col):
-            return filtered_by_row
-        else:
-            return filtered_by_col
+    def update_board(self, matches):
+        for match in matches:
+            for candy in match[0]:
+                self.board[candy[0]][candy[1]] ='w'
 
 def print_board(board):
     for row in board:
@@ -102,6 +109,8 @@ if __name__ == "__main__":
     #lines = [f'{key} {value}' for key, value in game.adj_list.items()]
     #print('\n'.join(lines))
     
-    game.find_matches()
+    matches = game.find_matches()
+    game.update_board(matches)
+    print_board(game.board)
 
     
