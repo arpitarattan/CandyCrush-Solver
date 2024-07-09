@@ -1,12 +1,15 @@
 import random
 from collections import Counter
 
-candy = ['r', 'b', 'g']
+candy = ['r', 'b', 'g', 'p', 'o']
 color_map = {
     'r': '\033[38;5;196m●\033[0m',  # Bright Red
-    'b': '\033[38;5;21m●\033[0m',   # Bright Blue
+    'b': '\033[38;5;33m●\033[0m',   # Bright Blue
     'g': '\033[38;5;46m●\033[0m',   # Bright Green
-    'w': '\033[38;5;15m●\033[0m'    # White
+    'w': '\033[38;5;15m●\033[0m',   # White
+    'p': '\033[38;5;93m●\033[0m',   # Pink
+    'o': '\033[38;5;214m●\033[0m'   # Orange
+
 }
 directions = [(0,1),(1,0)] #check down and right while traversing
 
