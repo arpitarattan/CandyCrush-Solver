@@ -13,7 +13,7 @@ color_map = {
 }
 directions = [(0,1),(1,0)] #check down and right while traversing
 
-random.seed(100)
+random.seed(1)
 
 class CandyCrush:
     def __init__(self, size):
@@ -109,7 +109,55 @@ class CandyCrush:
                     self.board[row][col] = new_candies[row]
                 else:
                     self.board[row][col] = column_candies[row - num_new_candies]
-                
+    
+    def swap_candies(self, pos1, pos2):
+        spots = []
+        for i in range(-2, 3):
+            for j in range(-2, 3):
+                if i == 0 and j == 0:
+                    continue  # Skip the center spot
+                new_x, new_y = pos2[0] + i, pos2[1] + j
+                if 0 <= new_x < self.size and 0 <= new_y < self.size:
+                    spots.append((new_x, new_y))
+
+        matches = []
+        directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+        board = self.board
+        temp = self.board[pos2[0]][pos2[1]]
+        board[pos2[0]][pos2[1]] = board[pos1[0]][pos1[1]]
+        board[pos1[0]][pos1[1]] = temp
+
+        for direction in directions:
+            match = self.check_match_in_direction(board, pos2, direction)
+            if match:
+                matches.extend(match)
+
+        # Remove duplicates and sort
+        matches = list(set(matches))
+        matches.sort()
+        return matches
+
+
+    def check_match_in_direction(self, board, start, direction, length=3):
+        x, y = start
+        dx, dy = direction
+        match = [(x, y)]
+        candy_type = board[x][y]
+        
+        for i in range(1, length):
+            new_x, new_y = x + i*dx, y + i*dy
+            if 0 <= new_x < len(board) and 0 <= new_y < len(board[0]):
+                if board[new_x][new_y] == candy_type:
+                    match.append((new_x, new_y))
+                else:
+                    break
+            else:
+                break
+
+        if len(match) >= length:
+            return match
+        return []
+    
 def print_board(board):
     for row in board:
         print(" ".join(color_map[candy] for candy in row))
@@ -119,11 +167,14 @@ if __name__ == "__main__":
     
     print_board(game.board)
     print('--------------')
-    #lines = [f'{key} {value}' for key, value in game.adj_list.items()]
-    #print('\n'.join(lines))
-    
+
     matches = game.find_matches()
     game.update_board(matches)
     print_board(game.board)
-
+    match = game.swap_candies((3,2), (2,2))
+    print('--------------')
+    print_board(game.board)
+    print('--------------')
+    game.update_board([[match]])
+    print_board(game.board)
     
