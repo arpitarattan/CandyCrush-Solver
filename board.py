@@ -165,16 +165,27 @@ def print_board(board):
 if __name__ == "__main__":
     game = CandyCrush(5)
     
-    print_board(game.board)
-    print('--------------')
+    while True:
+        matches = game.find_matches()
+        for i in range(5):
+            print_board(game.board)
+            print(matches)
+            game.update_board(matches)
+            matches = game.find_matches()
 
-    matches = game.find_matches()
-    game.update_board(matches)
-    print_board(game.board)
-    match = game.swap_candies((3,2), (2,2))
-    print('--------------')
-    print_board(game.board)
-    print('--------------')
-    game.update_board([[match]])
-    print_board(game.board)
+        print_board(game.board)
+        pos1 = input('Position 1:')
+        pos2 = input('Position 2:')
+        #(3,2), (2,2)
+        match = game.swap_candies(pos1, pos2)
+        matches = game.find_matches()
+
+        #while len(matches) != 0:
+        #    game.update_board(matches)
+        #    matches = game.find_matches()
+        print('--------------')
+        print_board(game.board)
+        #print('--------------')
+        #game.update_board([[match]])
+        #print_board(game.board)
     
