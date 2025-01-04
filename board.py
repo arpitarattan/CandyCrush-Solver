@@ -13,7 +13,7 @@ color_map = {
 }
 directions = [(0,1),(1,0)] #check down and right while traversing
 
-random.seed(1)
+random.seed(3)
 
 class CandyCrush:
     def __init__(self, size):
@@ -163,7 +163,7 @@ def print_board(board):
         print(" ".join(color_map[candy] for candy in row))
 
 if __name__ == "__main__":
-    game = CandyCrush(5)
+    game = CandyCrush(8)
     
     while True:
         matches = game.find_matches()
