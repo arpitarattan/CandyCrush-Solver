@@ -221,7 +221,7 @@ class GameBoard:
                     break
             else:
                 break
-        
+         
         # Return only if match meets required length else return no match
         if len(match) >= length:
             return match
