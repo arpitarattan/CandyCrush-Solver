@@ -1,5 +1,7 @@
-import random
-from collections import Counter
+"""
+ + board.py - Game mechanics for base Candy Crush
+"""
+import random, copy
 
 candy_types = ['r', 'b', 'g', 'p', 'o']
 color_map = {
@@ -15,7 +17,7 @@ directions = [(0,1),(1,0)] #check down and right while traversing
 
 random.seed(3)
 
-class CandyCrush:
+class GameBoard:
     def __init__(self, size):
         self.size = size # User defined size
         self.board = [[random.choice(candy_types) for _ in range(size)] for _ in range(size)]
@@ -81,7 +83,7 @@ class CandyCrush:
         # BFS on all unvisited nodes to find connected components
         for node in self.adj_list:
             if node not in visited:
-                path = self.bfs(node, self.adj_list)
+                path = self.bfs(node)
                 for n in path:
                     visited.add(n) #Mark each node as visited
 
@@ -169,26 +171,27 @@ class CandyCrush:
         '''
         
         # Step 1: Swap the two candies on the board. (Generate a new temporary board)
-        board = self.board
-        temp = self.board[pos2[0]][pos2[1]]
-        board[pos2[0]][pos2[1]] = board[pos1[0]][pos1[1]]
-        board[pos1[0]][pos1[1]] = temp
-
+        tempboard = copy.deepcopy(self.board)
+        temp = tempboard[pos2[0]][pos2[1]]
+        tempboard[pos2[0]][pos2[1]] = tempboard[pos1[0]][pos1[1]]
+        tempboard[pos1[0]][pos1[1]] = temp
+        
         # Step 2: Check for matches in all four cardinal directions around the new position of pos2.
         matches = []
         directions = [(-1, 0), (1, 0), (0, -1), (0, 1)] #left, right, down ,up
         
         for direction in directions:
             #Find match in current each direction
-            match = self.check_match_in_direction(board, pos2, direction)
+            match = self.check_match_in_direction(tempboard, pos2, direction)
             if match:
                 matches.extend(match)
 
-        # Remove duplicates and sort
+        # Remove duplicates, if matches found make changes in original board
         matches = list(set(matches))
-        matches.sort()
-
-        return matches
+        print(matches)
+        if len(matches) != 0 : 
+            self.board[pos2[0]][pos2[1]] = self.board[pos1[0]][pos1[1]]
+            self.board[pos1[0]][pos1[1]] = temp
 
     def check_match_in_direction(self, board, start, direction, length=3):
         '''
@@ -229,29 +232,29 @@ def print_board(board):
         print(" ".join(color_map[candy] for candy in row))
 
 if __name__ == "__main__":
-    game = CandyCrush(8)
+    game = GameBoard(5)
     
-    while True:
-        matches = game.find_matches()
-        for i in range(5):
-            print_board(game.board)
-            print(matches)
-            game.update_board(matches)
-            matches = game.find_matches()
+    #while True:
+    matches = game.find_matches()
+    # for i in range(5):
+    #     print_board(game.board)
+    #     print(matches)
+    #     game.update_board(matches)
+    #     matches = game.find_matches()
 
-        print_board(game.board)
-        pos1 = input('Position 1:')
-        pos2 = input('Position 2:')
-        #(3,2), (2,2)
-        match = game.swap_candies(pos1, pos2)
-        matches = game.find_matches()
+    print_board(game.board)
+    #pos1 = input('Position 1:')
+    #pos2 = input('Position 2:')
+    #(3,2), (2,2)
+    match = game.swap_candies((0,0), (1,0))
+   # matches = game.find_matches()
 
-        #while len(matches) != 0:
-        #    game.update_board(matches)
-        #    matches = game.find_matches()
-        print('--------------')
-        print_board(game.board)
-        #print('--------------')
-        #game.update_board([[match]])
-        #print_board(game.board)
+    #while len(matches) != 0:
+    #    game.update_board(matches)
+    #    matches = game.find_matches()
+    print('--------------')
+    print_board(game.board)
+    #print('--------------')
+    #game.update_board([[match]])
+    #print_board(game.board)
     
