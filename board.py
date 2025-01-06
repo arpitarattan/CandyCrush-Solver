@@ -15,7 +15,7 @@ color_map = {
 }
 directions = [(0,1),(1,0)] #check down and right while traversing
 
-random.seed(3)
+random.seed(0)
 
 class GameBoard:
     def __init__(self, size):
@@ -75,7 +75,7 @@ class GameBoard:
         Return: All found matches as a large list, each sublist being a match consisting of coords of candies, e.g.:
                 matches = [[(0,0), (0,1), (0,2)]]
         '''
-
+        self.adj_list = self.build_graph()
         visited = set()
         paths = [] # Holds connected components
         matches = [] # Valid matches 
@@ -100,10 +100,14 @@ class GameBoard:
             matches_y = self.filter_paths(sorted_by_y, 1)
 
             if(len(matches_x)> 0):
-                matches.append(matches_x)
+                matches.extend(matches_x)
             if(len(matches_y)> 0):
-                matches.append(matches_y)
+                matches.extend(matches_y)
         
+        # Duplicate Filtering
+        matches = list(set(tuple(sorted(match)) for match in matches))
+        matches = [list(match) for match in matches]
+
         return matches
     
     def filter_paths(self, path, coord = 0):
@@ -145,7 +149,7 @@ class GameBoard:
 
         # Step 1: Mark matched positions as empty by setting them to None
         for match in matches:
-            for candy in match[0]:
+            for candy in match:
                 self.board[candy[0]][candy[1]] = None
         
         # Step 2: Fill the board column by column.
@@ -166,32 +170,27 @@ class GameBoard:
         '''
         Function: Swaps two candies on the board and checks for matches formed as a result.
         Input: + pos1: The coordinates (x1, y1) of the first candy to be swapped.
-               + pos2: The coordinates (x1, y1) of the second candy to be swapped.
+               + pos2: The coordinates (x1, y1) of the second candy to be swapped. (This position will have match attempt)
         Return: A list of (x, y) coordinates representing all matched candies formed due to the swap.
         '''
+        # Step 1: Swap the two candies on the board. 
         
-        # Step 1: Swap the two candies on the board. (Generate a new temporary board)
-        tempboard = copy.deepcopy(self.board)
-        temp = tempboard[pos2[0]][pos2[1]]
-        tempboard[pos2[0]][pos2[1]] = tempboard[pos1[0]][pos1[1]]
-        tempboard[pos1[0]][pos1[1]] = temp
-        
-        # Step 2: Check for matches in all four cardinal directions around the new position of pos2.
-        matches = []
-        directions = [(-1, 0), (1, 0), (0, -1), (0, 1)] #left, right, down ,up
-        
-        for direction in directions:
-            #Find match in current each direction
-            match = self.check_match_in_direction(tempboard, pos2, direction)
-            if match:
-                matches.extend(match)
+        temp = self.board[pos2[0]][pos2[1]]  # Store the value at pos2
+        self.board[pos2[0]][pos2[1]] = self.board[pos1[0]][pos1[1]]
+        self.board[pos1[0]][pos1[1]] = temp
 
-        # Remove duplicates, if matches found make changes in original board
-        matches = list(set(matches))
-        print(matches)
-        if len(matches) != 0 : 
-            self.board[pos2[0]][pos2[1]] = self.board[pos1[0]][pos1[1]]
-            self.board[pos1[0]][pos1[1]] = temp
+        # Step 2: Check for matches
+        matches = self.find_matches()
+
+        # Step 3: Revert swap if no matches are found
+        if not matches:
+            print('Match not found!')
+            # Restore the original candies
+            self.board[pos1[0]][pos1[1]] = self.board[pos2[0]][pos2[1]]
+            self.board[pos2[0]][pos2[1]] = temp
+
+        return matches
+
 
     def check_match_in_direction(self, board, start, direction, length=3):
         '''
@@ -236,25 +235,10 @@ if __name__ == "__main__":
     
     #while True:
     matches = game.find_matches()
-    # for i in range(5):
-    #     print_board(game.board)
-    #     print(matches)
-    #     game.update_board(matches)
-    #     matches = game.find_matches()
-
     print_board(game.board)
-    #pos1 = input('Position 1:')
-    #pos2 = input('Position 2:')
-    #(3,2), (2,2)
-    match = game.swap_candies((0,0), (1,0))
-   # matches = game.find_matches()
+    match = game.swap_candies((1,0), (0,0))
 
-    #while len(matches) != 0:
-    #    game.update_board(matches)
-    #    matches = game.find_matches()
     print('--------------')
     print_board(game.board)
-    #print('--------------')
-    #game.update_board([[match]])
-    #print_board(game.board)
+
     

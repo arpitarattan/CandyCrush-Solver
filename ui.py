@@ -6,7 +6,7 @@ import random
 
 # Constants
 WINDOW_SIZE = 600
-GRID_SIZE = 8
+GRID_SIZE = 5
 CELL_SIZE = WINDOW_SIZE // GRID_SIZE
 FPS = 10
 
@@ -30,7 +30,6 @@ class BoardGraphics:
         self.size = size
         self.board = [[random.choice(CANDY_TYPES) for _ in range(size)] for _ in range(size)]
         self.selected = None  # Track selected candy
-        self.matches_to_remove = []  # Track candies to remove
         self.clock = pygame.time.Clock()
 
     def draw_board(self, board): 
@@ -56,47 +55,23 @@ class BoardGraphics:
             self.selected = None # To handle clicking of two points
             
             # Swap candies on board, if no matches found revert this swap
-            matches = game.swap_candies(pos1, pos2)
-
+            game.swap_candies(pos1, pos2)
 
         else:
             self.selected = (row, col)
 
-    def animate_removal(self):
+    def animate_removal(self, matches_to_remove):
         """Fade out matched candies."""
         for _ in range(5):  # Number of fade steps
-            for match in self.matches_to_remove:
+            for match in matches_to_remove:
                 for row, col in match:
                     pygame.draw.circle(
-                        screen,
+                        self.screen,
                         (0, 0, 0),
                         (col * CELL_SIZE + CELL_SIZE // 2, row * CELL_SIZE + CELL_SIZE // 2),
                         CELL_SIZE // 3
                     )
             pygame.display.flip()
-            clock.tick(FPS)
+            self.clock.tick(FPS)
 
-# Main loop
-def main():
-    game = CandyCrush(GRID_SIZE)
-    running = True
 
-    while running:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                game.handle_click(pygame.mouse.get_pos())
-
-        if game.matches_to_remove:
-            game.animate_removal()
-            game.update_board()
-
-        game.draw_board()
-        pygame.display.flip()
-        clock.tick(FPS)
-
-    pygame.quit()
-
-if __name__ == "__main__":
-    main()
