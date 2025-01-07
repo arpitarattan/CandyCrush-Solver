@@ -4,11 +4,11 @@
 
 from board import GameBoard
 from ui import BoardGraphics
-import pygame, random
+import pygame, random, time
 
 pygame.init()
 
-FPS = 10
+FPS = 30
 random.seed(0)
 if __name__ == "__main__":
     game = GameBoard(5)
@@ -21,9 +21,9 @@ if __name__ == "__main__":
                 running = False
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 graphics.handle_click(pygame.mouse.get_pos(), game)
-
+        
         matches = game.find_matches()
-        graphics.animate_removal(matches)
+        graphics.animate_removal(matches, board= game.board)
         game.update_board(matches)
         graphics.draw_board(game.board)
         pygame.display.flip()

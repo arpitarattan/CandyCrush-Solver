@@ -171,14 +171,14 @@ class GameBoard:
         Function: Swaps two candies on the board and checks for matches formed as a result.
         Input: + pos1: The coordinates (x1, y1) of the first candy to be swapped.
                + pos2: The coordinates (x1, y1) of the second candy to be swapped. (This position will have match attempt)
-        Return: A list of (x, y) coordinates representing all matched candies formed due to the swap.
+        Return: + Bool - True if match made, else False
         '''
         # Step 1: Swap the two candies on the board. 
         
         temp = self.board[pos2[0]][pos2[1]]  # Store the value at pos2
         self.board[pos2[0]][pos2[1]] = self.board[pos1[0]][pos1[1]]
         self.board[pos1[0]][pos1[1]] = temp
-
+        
         # Step 2: Check for matches
         matches = self.find_matches()
 
@@ -188,9 +188,9 @@ class GameBoard:
             # Restore the original candies
             self.board[pos1[0]][pos1[1]] = self.board[pos2[0]][pos2[1]]
             self.board[pos2[0]][pos2[1]] = temp
-
-        return matches
-
+            return False #No match
+        
+        return True     
 
     def check_match_in_direction(self, board, start, direction, length=3):
         '''
