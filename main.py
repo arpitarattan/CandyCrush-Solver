@@ -27,6 +27,7 @@ if __name__ == "__main__":
         game.update_board(matches)
         graphics.draw_board(game.board)
         graphics.draw_score(game.score)
+        print(game.get_avail_actions())
         pygame.display.flip()
         graphics.clock.tick(FPS)
 

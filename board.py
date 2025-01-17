@@ -1,7 +1,8 @@
 """
  + board.py - Game mechanics for base Candy Crush
 """
-import random, copy
+import random
+import numpy as np
 
 candy_types = ['r', 'b', 'g', 'p', 'o']
 directions = [(0,1),(1,0)] #check down and right while traversing
@@ -223,4 +224,48 @@ class GameBoard:
             return match
         return []
 
-    
+    def get_avail_actions(self):
+        '''
+        Function: Checks each candy surroundings to see all valid actions possible
+        Input: None               
+        Return: + actions: list of all possible actions as tuples of positions: [(pos1, pos2)]
+        '''
+
+        actions = []
+
+        w, h = len(self.board[0]), len(self.board)
+
+        for row in range(h):
+            for col in range(w):
+                candy = self.board[row][col]
+                
+                # Check all four directions, up, right, down, left
+                # Check Up
+                if row - 1 >= 0 and col - 1 >= 0 and col + 1 < w: 
+                    left, right = self.board[row - 1][col - 1], self.board[row-1][col+1]
+                    match = (candy == left) and (candy == right) 
+
+                    if match: actions.append( ((row, col), (row-1, col)) ) # Move up 
+                
+                # Check Right
+                if row - 1 >= 0 and row + 1 < h and col + 1 < w:
+                    up, down = self.board[row - 1][col + 1], self.board[row+1][col+1]
+                    match = (candy == down) and (candy == up) 
+
+                    if match: actions.append( ((row, col), (row, col + 1)) ) # Move Right 
+
+                # Check Down
+                if row + 1 < h and col - 1 >= 0 and col + 1 < w: 
+                    left, right = self.board[row + 1][col - 1], self.board[row + 1][col+1]
+                    match = (candy == left) and (candy == right) 
+
+                    if match: actions.append( ((row, col), (row + 1, col)) ) # Move Down 
+
+                # Check Left
+                if row - 1 >= 0 and col - 1 >= 0 and row + 1 < h: 
+                    up, down = self.board[row - 1][col - 1], self.board[row + 1][col - 1]
+                    match = (candy == up) and (candy == down)
+
+                    if match: actions.append( ((row, col), (row, col- 1)) ) # Move Left 
+
+        return actions
