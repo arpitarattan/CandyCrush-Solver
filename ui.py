@@ -31,6 +31,7 @@ class BoardGraphics:
         self.board = [[random.choice(CANDY_TYPES) for _ in range(size)] for _ in range(size)]
         self.selected = None  # Track selected candy
         self.clock = pygame.time.Clock()
+        self.font = pygame.font.Font(None, 36)  # Default font with size 36
 
     def draw_board(self, board): 
         '''
@@ -156,7 +157,6 @@ class BoardGraphics:
             pygame.display.flip()
             self.clock.tick(FPS)
 
-
     def animate_removal(self, matches_to_remove, board):
         '''
         Function: Fade out matched candies
@@ -179,4 +179,13 @@ class BoardGraphics:
             pygame.display.flip()
             self.clock.tick(FPS)
 
-
+    def draw_score(self, score):
+        '''
+        Function: Display score on screen
+        Input: + score - Score
+        Return: None
+        '''
+        score_text = f"Score: {score}"
+        text_surface = self.font.render(score_text, True, (255, 255, 255)) 
+        self.screen.blit(text_surface, (10, 10))  # Draw at top-left corner
+        

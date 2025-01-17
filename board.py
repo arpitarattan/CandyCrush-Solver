@@ -4,24 +4,17 @@
 import random, copy
 
 candy_types = ['r', 'b', 'g', 'p', 'o']
-color_map = {
-    'r': '\033[38;5;196m●\033[0m',  # Bright Red
-    'b': '\033[38;5;33m●\033[0m',   # Bright Blue
-    'g': '\033[38;5;46m●\033[0m',   # Bright Green
-    'w': '\033[38;5;15m●\033[0m',   # White
-    'p': '\033[38;5;93m●\033[0m',   # Pink
-    'o': '\033[38;5;214m●\033[0m'   # Orange
-
-}
 directions = [(0,1),(1,0)] #check down and right while traversing
-
 random.seed(0)
+
+POINTS = 10 # points per candy destroyed
 
 class GameBoard:
     def __init__(self, size):
         self.size = size # User defined size
         self.board = [[random.choice(candy_types) for _ in range(size)] for _ in range(size)]
         self.adj_list = self.build_graph() # Build adjacency list for candy matches
+        self.score = 0
 
     def build_graph(self):
         '''
@@ -165,6 +158,10 @@ class GameBoard:
                     self.board[row][col] = new_candies[row]
                 else:
                     self.board[row][col] = column_candies[row - num_new_candies]
+
+        # Update score 
+        for match in matches:
+            self.score += POINTS * len(match)
     
     def swap_candies(self, pos1, pos2):
         '''
@@ -225,20 +222,5 @@ class GameBoard:
         if len(match) >= length:
             return match
         return []
-
-def print_board(board):
-    for row in board:
-        print(" ".join(color_map[candy] for candy in row))
-
-if __name__ == "__main__":
-    game = GameBoard(5)
-    
-    #while True:
-    matches = game.find_matches()
-    print_board(game.board)
-    match = game.swap_candies((1,0), (0,0))
-
-    print('--------------')
-    print_board(game.board)
 
     
